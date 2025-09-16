@@ -1,0 +1,9 @@
+[package]
+name = "ticketing-poc"
+edition = "2024.beta"
+
+[dependencies]
+
+
+[addresses]
+ticketing_poc =  "0x0"

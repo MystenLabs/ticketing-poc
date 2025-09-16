@@ -1,0 +1,47 @@
+# IDE directories and files
+.idea
+.vscode
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# OS generated files
+.DS_Store*
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+pnpm-debug.log*
+sui.log*
+
+# Dependency and build-related directories
+node_modules/
+dist/
+build/
+
+# Move
+move/Move.lock
+move/build
+move/.coverage_map.mvcov
+move/.trace
+
+# env files under the setup directory
+setup/*.env
+.publish.res.json
+.vercel
+
+# npm configuration files
+.npmrc
+package-lock.json
+
+# other configuration files
+.env
+# exclude the .env of the app directory, it needs to be pushed to vercel to deploy the app correctly
+app/.env
+app/.env.localnet
