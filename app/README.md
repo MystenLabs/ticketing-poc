@@ -4,15 +4,16 @@ A decentralized ticketing application built with Next.js and the Sui blockchain.
 
 ## Quick Start
 
-1. **Copy the environment template:**
-   ```bash
-   cp .env.example .env
-   ```
-
-2. **Install dependencies:**
+1. **Install dependencies:**
    ```bash
    pnpm install
    ```
+
+2. **Set up environment variables:**
+   ```bash
+   cp .env.development.local.example .env.development.local
+   ```
+   Then configure your `.env.development.local` file (see Environment Variables section below)
 
 3. **Run the development server:**
    ```bash
@@ -24,7 +25,7 @@ A decentralized ticketing application built with Next.js and the Sui blockchain.
 
 ## Environment Variables
 
-Configure your `.env` file with:
+Configure your `.env.development.local` file with:
 - `NEXT_PUBLIC_PACKAGE` - Your deployed package address
 - `ADMIN_PRIVATE_KEY_ED25519` - Private key for admin operations
 - `ENOKI_SECRET_KEY` & `NEXT_PUBLIC_ENOKI_API_KEY` - For sponsored transactions
