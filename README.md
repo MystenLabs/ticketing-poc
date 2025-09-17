@@ -12,16 +12,15 @@ A decentralized ticketing and loyalty platform built on Sui.
 
 ### Basic Development Setup
 
-> **Note**: This setup will start the frontend, but full functionality requires smart contract deployment and external services (see sections below).
+> **Note**: This setup will start the frontend, but full functionality requires smart contract deployment and Vercel KV setup (see sections below).
 
 1. `cd app`
-2. `cp .env.example .env`
-3. `pnpm i`
-4. `pnpm run dev`
+2. `pnpm i`
+3. `pnpm run dev`
 
 For a complete working setup, you'll need to:
 - Deploy the Move smart contracts (see [Smart Contract Configuration](#smart-contract-configuration))
-- Set up Vercel KV for data persistence (see [Local development with Vercel KV](#local-development-with-vercel-kv))
+- Set up Vercel KV and environment variables (see [Local development with Vercel KV](#local-development-with-vercel-kv))
 
 ### Directories structure
 
