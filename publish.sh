@@ -18,6 +18,15 @@ echo "🌐 Network: ${ACTIVE_ENV}"
 echo "👤 Active Address: ${ACTIVE_ADDRESS}"
 echo "📦 Move Package: ${MOVE_PACKAGE_PATH}"
 
+suffix="$ACTIVE_ENV"
+
+ENV_FILE="./app/.env.$suffix"
+mkdir -p "$(dirname "$ENV_FILE")"
+if [ ! -f "$ENV_FILE" ]; then
+  touch "$ENV_FILE"
+  echo "📄 Created new environment file: $ENV_FILE"
+fi
+
 # Check gas balance
 GAS_COINS=$(sui client gas --json)
 TOTAL_BALANCE=$(echo "$GAS_COINS" | jq -r '[.[] | .mistBalance] | add // 0')
@@ -62,19 +71,17 @@ PUBLISHER_ID=$(echo "$newObjs" | jq -r 'select (.objectType | contains("::Publis
 # Extract KeyRegistry ID
 KEY_REGISTRY_ID=$(echo "$newObjs" | jq -r 'select (.objectType | endswith("::key_registry::KeyRegistry")).objectId')
 
-suffix=""
-if [ "$ACTIVE_ENV" = "localnet" ]; then
-  suffix=".localnet"
-fi
-
 # Update .env file (append or update existing values)
-ENV_FILE="./app/.env$suffix"
 
-# Remove existing lines if they exist, then append new ones
-if [ -f "$ENV_FILE" ]; then
-  grep -v "^NEXT_PUBLIC_PACKAGE=" "$ENV_FILE" > "${ENV_FILE}.tmp" 2>/dev/null || echo "" > "${ENV_FILE}.tmp"
-  grep -v "^NEXT_PUBLIC_KEY_REGISTRY=" "${ENV_FILE}.tmp" > "$ENV_FILE" 2>/dev/null || echo "" > "$ENV_FILE"
+# Remove existing lines if they exist, then clean up
+if [ -s "$ENV_FILE" ]; then
+  # File exists and has content
+  grep -v "^NEXT_PUBLIC_PACKAGE=" "$ENV_FILE" > "${ENV_FILE}.tmp" 2>/dev/null || cp "$ENV_FILE" "${ENV_FILE}.tmp"
+  grep -v "^NEXT_PUBLIC_KEY_REGISTRY=" "${ENV_FILE}.tmp" > "$ENV_FILE" 2>/dev/null || cp "${ENV_FILE}.tmp" "$ENV_FILE"
   rm -f "${ENV_FILE}.tmp"
+else
+  # File is empty or doesn't exist, ensure it's created
+  touch "$ENV_FILE"
 fi
 
 # Append new values

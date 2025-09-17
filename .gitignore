@@ -45,3 +45,6 @@ package-lock.json
 # exclude the .env of the app directory, it needs to be pushed to vercel to deploy the app correctly
 app/.env
 app/.env.localnet
+app/.env.devnet
+app/.env.testnet
+app/.env.mainnet
