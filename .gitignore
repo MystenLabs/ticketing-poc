@@ -48,3 +48,5 @@ app/.env.localnet
 app/.env.devnet
 app/.env.testnet
 app/.env.mainnet
+
+*.key
