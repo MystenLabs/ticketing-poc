@@ -1,6 +1,7 @@
 import { SponsorTxRequestBody } from "@/app/types/SponsorTx";
 import { NextRequest, NextResponse } from "next/server";
 import { enokiClient } from "../EnokiClient";
+import { getAllowedMoveCallTargets } from "@/app/lib/helpers-onchain";
 
 /*
  - Right now any txBlock whose moveCall targets are whitelisted in the Enoki Portal can be sponsored
@@ -21,6 +22,7 @@ export const POST = async (request: NextRequest) => {
       transactionKindBytes: txBytes,
       sender,
       allowedAddresses,
+      allowedMoveCallTargets: getAllowedMoveCallTargets(),
     })
     .then((resp) => {
       return NextResponse.json(resp, {

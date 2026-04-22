@@ -6,6 +6,7 @@ import { enokiClient } from "../../EnokiClient";
 import { TICKET_STAGES } from "@/app/data/constants";
 import { Ed25519Keypair } from "@mysten/sui/keypairs/ed25519";
 import { getFullnodeUrl, SuiClient } from "@mysten/sui/client";
+import { getAllowedMoveCallTargets } from "@/app/lib/helpers-onchain";
 interface MintStageRequest {
   ticketId: string;
 }
@@ -17,7 +18,7 @@ export const POST = async (request: NextRequest) => {
     if (!ticketId) {
       return NextResponse.json(
         { error: "Missing required fields: ticketId" },
-        { status: 400 },
+        { status: 400 }
       );
     }
 
@@ -25,7 +26,7 @@ export const POST = async (request: NextRequest) => {
     if (!packageId) {
       return NextResponse.json(
         { error: "NEXT_PUBLIC_PACKAGE not configured" },
-        { status: 500 },
+        { status: 500 }
       );
     }
 
@@ -33,7 +34,7 @@ export const POST = async (request: NextRequest) => {
     if (!registryId) {
       return NextResponse.json(
         { error: "NEXT_PUBLIC_KEY_REGISTRY not configured" },
-        { status: 500 },
+        { status: 500 }
       );
     }
     // Get private key from environment variables
@@ -41,7 +42,7 @@ export const POST = async (request: NextRequest) => {
     if (!adminPrivateKey) {
       return NextResponse.json(
         { error: "ADMIN_PRIVATE_KEY_ED25519 not configured" },
-        { status: 500 },
+        { status: 500 }
       );
     }
 
@@ -66,7 +67,7 @@ export const POST = async (request: NextRequest) => {
     // Transfer the stage transition to the ticket object
     tx.transferObjects(
       [attendedStage, collectibleStage],
-      tx.pure.address(ticketId),
+      tx.pure.address(ticketId)
     );
 
     tx.setSender(sender);
@@ -84,16 +85,16 @@ export const POST = async (request: NextRequest) => {
       sender,
       allowedAddresses: [sender, ticketId],
     };
-
     const sponsorResponse = await enokiClient.createSponsoredTransaction({
       network: sponsorTxBody.network,
       transactionKindBytes: sponsorTxBody.txBytes,
       sender: sponsorTxBody.sender,
       allowedAddresses: sponsorTxBody.allowedAddresses,
+      allowedMoveCallTargets: getAllowedMoveCallTargets(),
     });
 
     const { signature } = await keypair.signTransaction(
-      fromBase64(sponsorResponse.bytes),
+      fromBase64(sponsorResponse.bytes)
     );
     const executeResponse = await enokiClient.executeSponsoredTransaction({
       digest: sponsorResponse.digest,
@@ -108,7 +109,7 @@ export const POST = async (request: NextRequest) => {
         error: "Failed to create stage mint transaction",
         details: error instanceof Error ? error.message : "Unknown error",
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 };
