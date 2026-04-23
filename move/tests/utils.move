@@ -1,7 +1,7 @@
 module ticketing_poc::utils;
 
 use sui::{clock, test_scenario::{Self as ts, Scenario}, test_utils};
-use ticketing_poc::{init, key_registry::KeyRegistry, loyalty::{Self, Loyalty}};
+use ticketing_poc::{init, key_registry::{Self, KeyRegistry}, loyalty::{Self, Loyalty}};
 
 public fun setup(sender: address): (Scenario, KeyRegistry, Loyalty) {
     let mut scenario = ts::begin(sender);
@@ -11,7 +11,8 @@ public fun setup(sender: address): (Scenario, KeyRegistry, Loyalty) {
     loyalty::mint(&clock, scenario.ctx());
 
     scenario.next_tx(sender);
-    let registry = scenario.take_shared<KeyRegistry>();
+    let mut registry = scenario.take_shared<KeyRegistry>();
+    key_registry::set_pk_for_testing(&mut registry, admin_pk());
     let loyalty = scenario.take_from_sender<Loyalty>();
 
     clock.destroy_for_testing();

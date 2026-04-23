@@ -6,7 +6,8 @@
 module ticketing_poc::init;
 
 use sui::package;
-use ticketing_poc::{display, key_registry};
+use ticketing_poc::display;
+use ticketing_poc::key_registry;
 
 /// One-time witness for package initialization
 /// This struct can only be created once during package deployment
@@ -15,7 +16,7 @@ public struct INIT has drop {}
 /// Default Ed25519 public key for the key registry
 /// This key will be used to verify signatures for all permit operations
 /// In production, this should be replaced with the actual service's public key
-const DEFAULT_PK: vector<u8> = x"9f6311882b31b1eaf3fd2f423de5b20c2b389a028f80a5037d00f9b8a7896093";
+const DEFAULT_PK: vector<u8> = x"42296d88a9f466fbeea18064f6ee1821dc47b404f6fd0599e5709777cc9599df";
 
 /// Package initialization function
 /// Called automatically when the package is published to Sui network
