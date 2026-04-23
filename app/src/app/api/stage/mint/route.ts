@@ -3,9 +3,8 @@ import { Transaction } from "@mysten/sui/transactions";
 import { fromBase64, toBase64 } from "@mysten/sui/utils";
 import { SponsorTxRequestBody } from "@/app/types/SponsorTx";
 import { enokiClient } from "../../EnokiClient";
-import { TICKET_STAGES } from "@/app/data/constants";
 import { Ed25519Keypair } from "@mysten/sui/keypairs/ed25519";
-import { getFullnodeUrl, SuiClient } from "@mysten/sui/client";
+import { SuiGrpcClient } from "@mysten/sui/grpc";
 import { getAllowedMoveCallTargets } from "@/app/lib/helpers-onchain";
 interface MintStageRequest {
   ticketId: string;
@@ -74,7 +73,10 @@ export const POST = async (request: NextRequest) => {
 
     // Build transaction bytes
     const txBytes = await tx.build({
-      client: new SuiClient({ url: getFullnodeUrl("testnet") }),
+      client: new SuiGrpcClient({
+        baseUrl: "https://fullnode.testnet.sui.io:443",
+        network: "testnet",
+      }),
       onlyTransactionKind: true,
     });
 

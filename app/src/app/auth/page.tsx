@@ -1,7 +1,7 @@
 "use client";
 
 import { Spinner } from "@/app/components/general/Spinner";
-import { useCurrentAccount } from "@mysten/dapp-kit";
+import { useCurrentAccount } from "@mysten/dapp-kit-react";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 

@@ -1,4 +1,4 @@
-import { useCurrentWallet } from "@mysten/dapp-kit";
+import { useCurrentWallet } from "@mysten/dapp-kit-react";
 import { getSession } from "@mysten/enoki";
 import { useEffect, useState } from "react";
 
@@ -7,7 +7,7 @@ import { useEffect, useState } from "react";
  * Handles async getSession() that may require a wallet parameter
  */
 export const useSession = () => {
-  const { currentWallet } = useCurrentWallet();
+  const currentWallet = useCurrentWallet();
   const [session, setSession] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
 

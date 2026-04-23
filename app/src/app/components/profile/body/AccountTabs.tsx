@@ -3,16 +3,15 @@ import { GeneralAccountInformation } from "./GeneralAccountInformation";
 import { NotificationsPermissions } from "./NotificationsPermissions";
 import { Button } from "../../ui/button";
 import { ExitIcon } from "@radix-ui/react-icons";
-import { useCurrentWallet, useDisconnectWallet } from "@mysten/dapp-kit";
+import { useDAppKit } from "@mysten/dapp-kit-react";
 import { useRouter } from "next/navigation";
 
 export const AccountTab = () => {
-  const { currentWallet } = useCurrentWallet();
-  const { mutate: disconnect } = useDisconnectWallet();
+  const dAppKit = useDAppKit();
   const router = useRouter();
 
-  const handleLogout = () => {
-    disconnect();
+  const handleLogout = async () => {
+    await dAppKit.disconnectWallet();
     router.push("/");
   };
 

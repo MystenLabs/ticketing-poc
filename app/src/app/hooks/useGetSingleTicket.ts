@@ -22,14 +22,14 @@ export const useGetSingleTicket = (id?: string | null) => {
     setIsLoading(true);
     return suiClient
       .getObject({
-        id,
-        options: {
-          showContent: true,
-          showType: true,
+        objectId: id,
+        include: {
+          json: true,
         },
       })
       .then((resp) => {
-        const ticketObject = mapTicket((resp.data?.content as any)?.fields);
+        const ticketJson = resp.object?.json as any;
+        const ticketObject = mapTicket((ticketJson?.fields || ticketJson) as any);
         setTicket(ticketObject);
         setIsLoading(false);
       })

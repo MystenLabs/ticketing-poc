@@ -7,7 +7,7 @@ import {
   handleRegisterTicketId,
   handleUnRegisterTicketId,
 } from "../helpers/registerTicketsForUpdate";
-import { useCurrentAccount } from "@mysten/dapp-kit";
+import { useCurrentAccount } from "@mysten/dapp-kit-react";
 import { Transaction } from "@mysten/sui/transactions";
 import { useSponsorSignAndExecute } from "./useSponsorSignAndExecute";
 import { useSui } from "./useSui";
@@ -59,17 +59,12 @@ export const useUpdateTicketStage = ({
     }
 
     try {
-      const stageTransition = await suiClient.getOwnedObjects({
+      const stageTransition = await suiClient.listOwnedObjects({
         owner: ticketId,
-        options: {
-          showType: true,
-        },
-        filter: {
-          StructType: `${process.env.NEXT_PUBLIC_PACKAGE}::ticket_stage::StageTransition<${process.env.NEXT_PUBLIC_PACKAGE}::ticket_stage::${stage}>`,
-        },
+        type: `${process.env.NEXT_PUBLIC_PACKAGE}::ticket_stage::StageTransition<${process.env.NEXT_PUBLIC_PACKAGE}::ticket_stage::${stage}>`,
       });
 
-      const stageTransitionId = stageTransition?.data?.[0]?.data?.objectId;
+      const stageTransitionId = stageTransition?.objects?.[0]?.objectId;
       if (!stageTransitionId) {
         toast.error("Could not find stage transition object");
         return;
@@ -87,13 +82,22 @@ export const useUpdateTicketStage = ({
 
       const resp = await sponsorSignAndExecute({
         tx,
-        options: {
-          showObjectChanges: true,
-          showEffects: true,
+        include: {
+          objectTypes: true,
+          effects: true,
         },
       });
 
       if (resp) {
+        const txResult = resp.Transaction ?? resp.FailedTransaction;
+        if (!txResult) {
+          throw new Error("Transaction result missing");
+        }
+        if (!txResult.status.success) {
+          throw new Error(
+            txResult.status.error?.message || "Transaction execution failed",
+          );
+        }
         const message =
           stage === TICKET_STAGES.ACTIVATED
             ? "You are getting close!"

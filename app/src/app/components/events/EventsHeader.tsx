@@ -1,6 +1,4 @@
 import Slider from "react-slick";
-import "slick-carousel/slick/slick.css";
-import "slick-carousel/slick/slick-theme.css";
 import { mockEvents } from "@/app/data/mockEvents";
 import { EventCard } from "./EventCard";
 import { LoyaltyCard } from "../loyaltyCard/LoyaltyCard";

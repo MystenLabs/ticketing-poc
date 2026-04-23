@@ -3,7 +3,7 @@
 import React, { Suspense, useEffect, useMemo, useState } from "react";
 import dynamic from "next/dynamic";
 import { AnonymousMessage } from "../components/address/AnonymousMessage";
-import { useCurrentAccount } from "@mysten/dapp-kit";
+import { useCurrentAccount } from "@mysten/dapp-kit-react";
 import { ProfileAccountCard } from "../components/profile/header/ProfileAccountCard";
 import { ProfileTabs } from "../components/profile/body/ProfileTabs";
 import { AccountTab } from "../components/profile/body/AccountTabs";

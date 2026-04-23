@@ -9,18 +9,25 @@ A decentralized ticketing application built with Next.js and the Sui blockchain.
    pnpm install
    ```
 
-2. **Set up environment variables:**
+2. **Run the bootstrap script from the repository root (one-time):**
+   ```bash
+   cd ..
+   bash ./bootstrap.sh
+   cd app
+   ```
+
+3. **Set up environment variables:**
    ```bash
    cp .env.development.local.example .env.development.local
    ```
    Then configure your `.env.development.local` file (see Environment Variables section below)
 
-3. **Run the development server:**
+4. **Run the development server:**
    ```bash
    pnpm dev
    ```
 
-4. **Open your browser:**
+5. **Open your browser:**
    Navigate to [http://localhost:3000](http://localhost:3000)
 
 ## Environment Variables

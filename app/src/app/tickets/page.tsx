@@ -8,7 +8,7 @@ import { TicketNFT } from "../components/ticketNFT/TicketNFT";
 import { AnonymousMessage } from "../components/address/AnonymousMessage";
 import { useGetTickets } from "../hooks/useGetTickets";
 import { Spinner } from "../components/general/Spinner";
-import { useCurrentAccount } from "@mysten/dapp-kit";
+import { useCurrentAccount } from "@mysten/dapp-kit-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Tabs, TabsList, TabsTrigger } from "../components/ui/tabs";
 import { TabsContent } from "@radix-ui/react-tabs";

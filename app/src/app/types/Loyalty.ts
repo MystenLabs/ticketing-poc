@@ -5,9 +5,7 @@ export interface Loyalty {
 }
 
 export interface OnChainLoyalty {
-  id: {
-    id: string;
-  };
+  id: { id: string } | string;
   loyalty_points: string;
   tenure_date: string;
 }

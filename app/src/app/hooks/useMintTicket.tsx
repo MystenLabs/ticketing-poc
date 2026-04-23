@@ -5,7 +5,7 @@ import { dateTimeStringToNumber } from "../helpers/dates";
 import { Seat } from "../types/Seat";
 import { generateRandomSeatNumbers } from "../helpers/seats";
 import { useRouter } from "next/navigation";
-import { useCurrentAccount } from "@mysten/dapp-kit";
+import { useCurrentAccount } from "@mysten/dapp-kit-react";
 import { handleRegisterTicketId } from "../helpers/registerTicketsForUpdate";
 import { useMintTicketPermit } from "./useMintTicketPermit";
 import { useSignatureTicketMint } from "./useSignatureTicketMint";

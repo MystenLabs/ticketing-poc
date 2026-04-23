@@ -1,7 +1,11 @@
 module ticketing_poc::utils;
 
-use sui::{clock, test_scenario::{Self as ts, Scenario}, test_utils};
-use ticketing_poc::{init, key_registry::{Self, KeyRegistry}, loyalty::{Self, Loyalty}};
+use sui::clock;
+use sui::test_scenario::{Self as ts, Scenario};
+use sui::test_utils;
+use ticketing_poc::init;
+use ticketing_poc::key_registry::{Self, KeyRegistry};
+use ticketing_poc::loyalty::{Self, Loyalty};
 
 public fun setup(sender: address): (Scenario, KeyRegistry, Loyalty) {
     let mut scenario = ts::begin(sender);

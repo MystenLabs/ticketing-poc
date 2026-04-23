@@ -1,11 +1,17 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import dynamic from "next/dynamic";
 import { EventsHeader } from "./components/events/EventsHeader";
 import { EventsList } from "./components/events/EventsList";
-import { SignIn } from "./components/landing/SignIn";
 import { AskPermissionSheet } from "./components/notifications/AskPermissionSheet";
-import { useCurrentAccount } from "@mysten/dapp-kit";
+import { useCurrentAccount } from "@mysten/dapp-kit-react";
+
+const SignIn = dynamic(
+  () => import("./components/landing/SignIn").then((mod) => mod.SignIn),
+  {
+    ssr: false,
+  },
+);
 
 const LandingPage = () => {
   const currentAccount = useCurrentAccount();

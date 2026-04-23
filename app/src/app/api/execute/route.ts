@@ -1,6 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
-import { ExecuteSponsoredTransactionApiInput } from "@mysten/enoki/dist/cjs/EnokiClient/type";
 import { enokiClient } from "../EnokiClient";
+
+interface ExecuteSponsoredTransactionApiInput {
+  digest: string;
+  signature: string;
+}
 
 export const POST = async (request: NextRequest) => {
   const { digest, signature }: ExecuteSponsoredTransactionApiInput =

@@ -1,16 +1,23 @@
 import { ImagesGrid } from "./ImagesGrid";
 import Image from "next/image";
-import { useWallets, useConnectWallet } from "@mysten/dapp-kit";
-import { isEnokiWallet, EnokiWallet, AuthProvider } from "@mysten/enoki";
+import { useDAppKit, useWallets } from "@mysten/dapp-kit-react";
+import { isEnokiWallet, AuthProvider, getWalletMetadata } from "@mysten/enoki";
+import type { UiWallet } from "@mysten/dapp-kit-react";
 import Link from "next/link";
 
 export const SignIn = () => {
-  const { mutate: connect } = useConnectWallet();
+  const dAppKit = useDAppKit();
 
   const wallets = useWallets().filter(isEnokiWallet);
   const walletsByProvider = wallets.reduce(
-    (map, wallet) => map.set(wallet.provider, wallet),
-    new Map<AuthProvider, EnokiWallet>(),
+    (map, wallet) => {
+      const provider = getWalletMetadata(wallet)?.provider;
+      if (provider) {
+        map.set(provider, wallet);
+      }
+      return map;
+    },
+    new Map<AuthProvider, UiWallet>(),
   );
 
   const googleWallet = walletsByProvider.get("google");
@@ -39,9 +46,10 @@ export const SignIn = () => {
         </div>
         <Link
           href="#"
-          onClick={() => {
+          onClick={async (e) => {
+            e.preventDefault();
             if (googleWallet) {
-              connect({ wallet: googleWallet });
+              await dAppKit.connectWallet({ wallet: googleWallet });
             }
           }}
           className="flex items-center justify-center space-x-2 w-full max-w-[500px] px-4 py-2 bg-white text-center text-sui-steel-80 border border-sui-steel-40 rounded-lg"

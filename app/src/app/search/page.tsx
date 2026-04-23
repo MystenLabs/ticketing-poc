@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { Header } from "../components/layouts/Header";
-import { useCurrentAccount } from "@mysten/dapp-kit";
+import { useCurrentAccount } from "@mysten/dapp-kit-react";
 import { useSearchEvents } from "../hooks/useSearchEvents";
 import { SearchEventsForm } from "../components/search/SearchEventsForm";
 import { SearchEventsResults } from "../components/search/SearchEventsResults";
