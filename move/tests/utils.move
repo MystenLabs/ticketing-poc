@@ -2,7 +2,6 @@ module ticketing_poc::utils;
 
 use sui::clock;
 use sui::test_scenario::{Self as ts, Scenario};
-use sui::test_utils;
 use ticketing_poc::init;
 use ticketing_poc::key_registry::{Self, KeyRegistry};
 use ticketing_poc::loyalty::{Self, Loyalty};
@@ -25,7 +24,7 @@ public fun setup(sender: address): (Scenario, KeyRegistry, Loyalty) {
 
 public fun cleanup(scenario: Scenario, registry: KeyRegistry, loyalty: Loyalty) {
     ts::return_shared(registry);
-    test_utils::destroy(loyalty);
+    std::unit_test::destroy(loyalty);
     scenario.end();
 }
 
