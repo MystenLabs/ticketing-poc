@@ -1,6 +1,7 @@
 module ticketing_poc::loyalty_tests;
 
-use sui::{clock, test_utils::assert_eq};
+use sui::clock;
+use std::unit_test::assert_eq;
 use ticketing_poc::{
     loyalty::{Self, Loyalty, EPermitDomainMismatch, EInvalidLoyaltyId},
     utils::{Self, setup, cleanup}
@@ -10,8 +11,8 @@ use ticketing_poc::{
 fun mint_loyalty() {
     let (scenario, registry, loyalty) = setup(utils::admin_address());
 
-    assert_eq(loyalty.tenure_date(), 0);
-    assert_eq(loyalty.loyalty_points(), 0);
+    assert_eq!(loyalty.tenure_date(), 0);
+    assert_eq!(loyalty.loyalty_points(), 0);
 
     cleanup(scenario, registry, loyalty);
 }
@@ -20,8 +21,8 @@ fun mint_loyalty() {
 fun updates_loyalty_points() {
     let (mut scenario, mut registry, mut loyalty) = setup(utils::admin_address());
 
-    assert_eq(loyalty.id(), utils::admin_loyalty_id());
-    assert_eq(loyalty.loyalty_points(), 0);
+    assert_eq!(loyalty.id(), utils::admin_loyalty_id());
+    assert_eq!(loyalty.loyalty_points(), 0);
 
     let permit = loyalty::new_loyalty_point_permit(
         &mut registry,
@@ -30,7 +31,7 @@ fun updates_loyalty_points() {
         scenario.ctx(),
     );
     loyalty.add_points(permit);
-    assert_eq(loyalty.loyalty_points(), 500);
+    assert_eq!(loyalty.loyalty_points(), 500);
 
     cleanup(scenario, registry, loyalty);
 }

@@ -8,19 +8,18 @@
 /// - All operations include replay protection via nonce system
 module ticketing_poc::ticket;
 
-use std::{string::String, type_name};
+use std::string::String;
 use sui::{bcs, transfer::Receiving};
 use ticketing_poc::{
     key_registry::KeyRegistry,
     loyalty::Loyalty,
-    ticket_stage::{StageTransition, Purchased, Attended, Collectible}
+    ticket_stage::{Self, StageTransition}
 };
 
 // ===== Error Codes =====
 const EPermitDomainMismatch: u64 = 0;
 const EPermitOwnerMismatch: u64 = 1;
 const ELeftoverBytesDetected: u64 = 2;
-const EInvalidStageTransition: u64 = 3;
 
 /// Domain identifier for ticket mint permits
 /// Used to prevent permits from being used across different operations
@@ -246,27 +245,29 @@ public fun mint(permit: TicketMintPermit, loyalty: &mut Loyalty, ctx: &mut TxCon
 /// Security
 /// Stage transitions can only be created by admins through the key registry,
 /// ensuring only authorized personnel can update ticket stages.
+#[allow(deprecated_usage)]
 public fun update_stage<T: drop>(ticket: &mut Ticket, stage: Receiving<StageTransition<T>>) {
     // Receive the stage transition object
-    let stage = transfer::public_receive(&mut ticket.id, stage);
-    let type_name = type_name::get<StageTransition<T>>();
+    let stage_obj = transfer::public_receive(&mut ticket.id, stage);
+    
+    let type_name = std::type_name::get<StageTransition<T>>();
 
     // Determine the target stage based on transition type
-    let to = if (type_name == type_name::get<StageTransition<Purchased>>()) {
+    let to = if (type_name == std::type_name::get<StageTransition<ticket_stage::Purchased>>()) {
         Stage::Purchased
-    } else if (type_name == type_name::get<StageTransition<Attended>>()) {
+    } else if (type_name == std::type_name::get<StageTransition<ticket_stage::Attended>>()) {
         Stage::Attended
-    } else if (type_name == type_name::get<StageTransition<Collectible>>()) {
+    } else if (type_name == std::type_name::get<StageTransition<ticket_stage::Collectible>>()) {
         Stage::Collectible
     } else {
-        abort EInvalidStageTransition
+        abort 0 // Should not happen if transitions are correctly minted
     };
 
     // Update the ticket's stage
     ticket.stage = to;
 
     // Clean up the consumed stage transition object
-    stage.delete();
+    ticket_stage::delete(stage_obj);
 }
 
 // ===== Getter Functions =====

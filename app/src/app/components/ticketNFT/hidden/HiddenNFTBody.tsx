@@ -2,7 +2,7 @@ import { Ticket } from "@/app/types/Ticket";
 import Image from "next/image";
 import React from "react";
 import { SuiExplorerLink } from "../../general/SuiExplorerLink";
-import { useCurrentAccount } from "@mysten/dapp-kit";
+import { useCurrentAccount } from "@mysten/dapp-kit-react";
 
 interface HiddenNFTProps {
   ticket: Ticket;

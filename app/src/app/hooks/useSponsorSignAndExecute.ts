@@ -2,30 +2,61 @@ import { useState } from "react";
 import { Transaction } from "@mysten/sui/transactions";
 import { useSui } from "./useSui";
 import { SponsorTxRequestBody } from "../types/SponsorTx";
-import { toB64, fromB64 } from "@mysten/sui/utils";
-import { useCurrentAccount, useSignTransaction } from "@mysten/dapp-kit";
+import { toBase64 } from "@mysten/sui/utils";
+import { useCurrentAccount, useDAppKit } from "@mysten/dapp-kit-react";
 import axios, { AxiosResponse } from "axios";
-import {
-  CreateSponsoredTransactionApiResponse,
-  ExecuteSponsoredTransactionApiInput,
-} from "@mysten/enoki/dist/cjs/EnokiClient/type";
-import { SuiTransactionBlockResponseOptions } from "@mysten/sui/client";
 import toast from "react-hot-toast";
+
+interface CreateSponsoredTransactionResponse {
+  bytes: string;
+  digest: string;
+}
+
+interface ExecuteSponsoredTransactionInput {
+  signature: string;
+  digest: string;
+}
+
+type TransactionInclude = {
+  balanceChanges?: boolean;
+  effects?: boolean;
+  events?: boolean;
+  objectTypes?: boolean;
+  transaction?: boolean;
+  bcs?: boolean;
+};
+
+type TransactionResult = {
+  Transaction?: {
+    status: { success: boolean; error: { message?: string } | null };
+    effects?: {
+      changedObjects: Array<{ objectId: string; idOperation: string }>;
+    };
+    objectTypes?: Record<string, string>;
+  };
+  FailedTransaction?: {
+    status: { success: boolean; error: { message?: string } | null };
+    effects?: {
+      changedObjects: Array<{ objectId: string; idOperation: string }>;
+    };
+    objectTypes?: Record<string, string>;
+  };
+};
 
 export const useSponsorSignAndExecute = () => {
   const [isLoading, setIsLoading] = useState(false);
   const currentAccount = useCurrentAccount();
   const address = currentAccount?.address;
-  const { mutateAsync: signTransaction } = useSignTransaction();
+  const dAppKit = useDAppKit();
   const { suiClient } = useSui();
 
   const sponsorSignAndExecute = async ({
     tx,
-    options,
+    include,
   }: {
     tx: Transaction;
-    options: SuiTransactionBlockResponseOptions;
-  }) => {
+    include: TransactionInclude;
+  }): Promise<TransactionResult | undefined> => {
     setIsLoading(true);
     try {
       const txBytes = await tx.build({
@@ -38,30 +69,27 @@ export const useSponsorSignAndExecute = () => {
 
       const sponsorTxBody: SponsorTxRequestBody = {
         network: "testnet",
-        txBytes: toB64(txBytes),
+        txBytes: toBase64(txBytes),
         sender: address,
         allowedAddresses: [address],
       };
-      const sponsorResponse: AxiosResponse<CreateSponsoredTransactionApiResponse> =
+      const sponsorResponse: AxiosResponse<CreateSponsoredTransactionResponse> =
         await axios.post("/api/sponsor", sponsorTxBody);
       const { bytes, digest: sponsorDigest } = sponsorResponse.data;
-      const { signature } = await signTransaction({
+      const { signature } = await dAppKit.signTransaction({
         transaction: bytes,
-        account: currentAccount!,
       });
-      const signatureString =
-        typeof signature === "string" ? signature : toB64(signature);
-      const executeSponsoredTxBody: ExecuteSponsoredTransactionApiInput = {
-        signature: signatureString,
+      const executeSponsoredTxBody: ExecuteSponsoredTransactionInput = {
+        signature,
         digest: sponsorDigest,
       };
       const executeResponse: AxiosResponse<{ digest: string }> =
         await axios.post("/api/execute", executeSponsoredTxBody);
-      let digest = executeResponse.data.digest;
+      const digest = executeResponse.data.digest;
       await suiClient.waitForTransaction({ digest, timeout: 5_000 });
-      return suiClient.getTransactionBlock({
+      return suiClient.getTransaction({
         digest,
-        options,
+        include,
       });
     } catch (err) {
       console.error(err);

@@ -5,7 +5,7 @@ import { formatAddress } from "@mysten/sui/utils";
 import Link from "next/link";
 import { getNetworkName } from "@/app/helpers/getNetworkName";
 import { useSession } from "@/app/hooks/useSession";
-import { useCurrentAccount } from "@mysten/dapp-kit";
+import { useCurrentAccount } from "@mysten/dapp-kit-react";
 
 export const GeneralAccountInformation = () => {
   const { session, isLoading: isSessionLoading } = useSession();

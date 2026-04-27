@@ -5,7 +5,7 @@ import { Spinner } from "@/app/components/general/Spinner";
 import { Header } from "@/app/components/layouts/Header";
 import { TicketNFTInWallet } from "@/app/components/ticketNFT/TicketNFTInWallet";
 import { TICKET_STAGES } from "@/app/data/constants";
-import { useCurrentAccount } from "@mysten/dapp-kit";
+import { useCurrentAccount } from "@mysten/dapp-kit-react";
 import { useGetSingleTicket } from "@/app/hooks/useGetSingleTicket";
 import { useParams, useSearchParams } from "next/navigation";
 import { Suspense, useMemo, useEffect, useState } from "react";

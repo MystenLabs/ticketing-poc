@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useSui } from "./useSui";
 import { mapTicket } from "../mappers/mapTicket";
 import { Ticket } from "../types/Ticket";
-import { useCurrentAccount } from "@mysten/dapp-kit";
+import { useCurrentAccount } from "@mysten/dapp-kit-react";
 
 export const useGetTickets = () => {
   const { suiClient } = useSui();
@@ -22,20 +22,23 @@ export const useGetTickets = () => {
   const getTickets = async () => {
     setIsLoading(true);
     suiClient
-      .getOwnedObjects({
+      .listOwnedObjects({
         owner: address!,
-        options: {
-          showContent: true,
-          showType: true,
+        include: {
+          json: true,
         },
       })
       .then((resp) => {
-        const ticketOnChainObjects = resp.data.filter(
-          ({ data: { type } }: any) =>
-            type === `${process.env.NEXT_PUBLIC_PACKAGE}::ticket::Ticket`,
+        const ticketOnChainObjects = resp.objects.filter(
+          (object) =>
+            object.type === `${process.env.NEXT_PUBLIC_PACKAGE}::ticket::Ticket`,
         );
         const ticketObjects = ticketOnChainObjects.map(
-          ({ data: { content } }: any) => mapTicket(content.fields),
+          (object) => {
+            const ticketJson = object.json as any;
+            const ticketFields = ticketJson?.fields || ticketJson;
+            return mapTicket(ticketFields);
+          },
         );
         setTickets(ticketObjects);
         setIsLoading(false);

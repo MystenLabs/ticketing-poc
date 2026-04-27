@@ -1,10 +1,9 @@
 import { useState } from "react";
 import { Transaction } from "@mysten/sui/transactions";
-// import { useSuiClient } from "@mysten/dapp-kit"; // Commented out if not available
 import { TicketMintResponse } from "@/app/types/TicketMint";
 import { useSponsorSignAndExecute } from "./useSponsorSignAndExecute";
 import { fromHex } from "@mysten/bcs";
-import { useCurrentAccount } from "@mysten/dapp-kit";
+import { useCurrentAccount } from "@mysten/dapp-kit-react";
 
 interface UseSignatureTicketMintResult {
   mintWithSignature: (
@@ -61,21 +60,30 @@ export const useSignatureTicketMint = (): UseSignatureTicketMintResult => {
 
       const result = await sponsorSignAndExecute({
         tx: txb,
-        options: { showEffects: true, showObjectChanges: true },
+        include: { effects: true, objectTypes: true },
       });
 
       if (!result) {
         throw new Error("Transaction failed");
       }
 
-      // Find the created Ticket object
-      const createdTicket = result!.objectChanges!.find(
+      const txResult = result.Transaction ?? result.FailedTransaction;
+      if (!txResult) {
+        throw new Error("Transaction result missing");
+      }
+      if (!txResult.status.success) {
+        throw new Error(txResult.status.error?.message || "Transaction failed");
+      }
+
+      const createdTicket = txResult.effects?.changedObjects.find(
         (change) =>
-          change.type === "created" &&
-          typeof change.objectType === "string" &&
-          change.objectType.endsWith("::ticket::Ticket"),
+          change.idOperation === "Created" &&
+          txResult.objectTypes?.[change.objectId]?.endsWith("::ticket::Ticket"),
       );
-      const ticketId = (createdTicket as any).objectId;
+      const ticketId = createdTicket?.objectId;
+      if (!ticketId) {
+        throw new Error("Could not find created ticket object");
+      }
 
       return ticketId;
     } catch (err) {

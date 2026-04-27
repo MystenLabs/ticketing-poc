@@ -6,7 +6,8 @@
 module ticketing_poc::init;
 
 use sui::package;
-use ticketing_poc::{display, key_registry};
+use ticketing_poc::display;
+use ticketing_poc::key_registry;
 
 /// One-time witness for package initialization
 /// This struct can only be created once during package deployment

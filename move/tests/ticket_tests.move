@@ -1,6 +1,7 @@
 module ticketing_poc::ticket_tests;
 
-use sui::{test_scenario as ts, test_utils::assert_eq};
+use sui::test_scenario as ts;
+use std::unit_test::assert_eq;
 use ticketing_poc::{
     key_registry::{Self, KeyRegistry},
     loyalty::Loyalty,
@@ -37,21 +38,21 @@ fun creates_ticket() {
     let ticket = create_ticket(&mut registry, &mut loyalty, scenario.ctx());
 
     let (purchased, _, _) = ticket::stages();
-    assert_eq(ticket.loyalty_id(), loyalty.id());
-    assert_eq(ticket.loyalty_points(), 250);
-    assert_eq(ticket.event_id(), b"3".to_string());
-    assert_eq(ticket.event_date(), 1733428800000);
-    assert_eq(ticket.event_location(), b"Venice, Italy".to_string());
-    assert_eq(ticket.venue(), b"Royal Masked Hall".to_string());
-    assert_eq(ticket.section(), b"Section 03".to_string());
-    assert_eq(ticket.seats(), vector[b"U5".to_string()]);
-    assert_eq(
+    assert_eq!(ticket.loyalty_id(), loyalty.id());
+    assert_eq!(ticket.loyalty_points(), 250);
+    assert_eq!(ticket.event_id(), b"3".to_string());
+    assert_eq!(ticket.event_date(), 1733428800000);
+    assert_eq!(ticket.event_location(), b"Venice, Italy".to_string());
+    assert_eq!(ticket.venue(), b"Royal Masked Hall".to_string());
+    assert_eq!(ticket.section(), b"Section 03".to_string());
+    assert_eq!(ticket.seats(), vector[b"U5".to_string()]);
+    assert_eq!(
         ticket.event_description(),
         b"Step into a world of mystery and elegance at our grand masquerade ball.".to_string(),
     );
-    assert_eq(ticket.event_name(), b"Magic Light in IT".to_string());
-    assert_eq(ticket.stage(), purchased);
-    assert_eq(ticket.price(), 40);
+    assert_eq!(ticket.event_name(), b"Magic Light in IT".to_string());
+    assert_eq!(ticket.stage(), purchased);
+    assert_eq!(ticket.price(), 40);
     transfer::public_transfer(ticket, utils::ticket_minter_address());
 
     cleanup(scenario, registry, loyalty);
@@ -64,7 +65,7 @@ fun updates_ticket_stage() {
     scenario.next_tx(utils::ticket_minter_address());
     let mut ticket = create_ticket(&mut registry, &mut loyalty, scenario.ctx());
     let (purchased, attended, collectible) = ticket::stages();
-    assert_eq(ticket.stage(), purchased);
+    assert_eq!(ticket.stage(), purchased);
 
     scenario.next_tx(utils::admin_address());
     let purchased_transition = ticket_stage::mint_purchased(&registry, scenario.ctx());
@@ -77,9 +78,9 @@ fun updates_ticket_stage() {
 
     scenario.next_tx(utils::ticket_minter_address());
     ticket.update_stage<Attended>(ts::receiving_ticket_by_id(attended_id));
-    assert_eq(ticket.stage(), attended);
+    assert_eq!(ticket.stage(), attended);
     ticket.update_stage<Collectible>(ts::receiving_ticket_by_id(collectible_id));
-    assert_eq(ticket.stage(), collectible);
+    assert_eq!(ticket.stage(), collectible);
 
     transfer::public_transfer(ticket, utils::ticket_minter_address());
 

@@ -1,7 +1,9 @@
 #!/bin/bash
 
+set -euo pipefail
+
 # check dependencies are available.
-for i in jq curl sui bc; do
+for i in jq curl sui bc python3; do
   if ! command -v ${i} >/dev/null 2>&1; then
     echo "${i} is not installed"
     exit 1
@@ -49,27 +51,82 @@ if [[ ! $REPLY =~ ^[Yy]$ ]]; then
   exit 0
 fi
 
-publish_res=$(sui client publish --json ${MOVE_PACKAGE_PATH})
+PUBLISH_RAW_FILE=".publish.raw.log"
+PUBLISH_JSON_FILE=".publish.res.json"
 
-echo ${publish_res} >.publish.res.json
+# Capture both stdout/stderr so warnings are preserved for debugging.
+# Do not let set -e exit before we can print output.
+set +e
+publish_output="$(sui client publish --json ${MOVE_PACKAGE_PATH} 2>&1)"
+publish_exit_code=$?
+set -e
 
-# Check if the command succeeded (exit status 0)
-if [[ "$publish_res" =~ "error" ]]; then
-  # If yes, print the error message and exit the script
-  echo "Error during move contract publishing.  Details : $publish_res"
+printf "%s\n" "$publish_output" > "$PUBLISH_RAW_FILE"
+
+echo "🧾 Full publish output:"
+echo "----------------------------------------"
+printf "%s\n" "$publish_output"
+echo "----------------------------------------"
+echo "📝 Saved raw output to: $PUBLISH_RAW_FILE"
+
+if [ "$publish_exit_code" -ne 0 ]; then
+  echo "Error during move contract publishing (exit code: $publish_exit_code)."
+  echo "Inspect $PUBLISH_RAW_FILE for details."
+  exit "$publish_exit_code"
+fi
+
+# Extract first valid JSON object from raw output (warnings can prefix JSON).
+publish_res="$(python3 - "$PUBLISH_RAW_FILE" <<'PY'
+import json
+import pathlib
+import sys
+
+text = pathlib.Path(sys.argv[1]).read_text()
+decoder = json.JSONDecoder()
+
+for i, ch in enumerate(text):
+    if ch != "{":
+        continue
+    try:
+        obj, _ = decoder.raw_decode(text[i:])
+        print(json.dumps(obj))
+        raise SystemExit(0)
+    except json.JSONDecodeError:
+        continue
+
+raise SystemExit(1)
+PY
+)"
+
+if [ -z "${publish_res:-}" ]; then
+  echo "Error during move contract publishing. Could not extract JSON output."
+  echo "Inspect $PUBLISH_RAW_FILE for details."
   exit 1
 fi
 
-publishedObjs=$(echo "$publish_res" | jq -r '.objectChanges[] | select(.type == "published")')
+printf "%s\n" "$publish_res" > "$PUBLISH_JSON_FILE"
+echo "📝 Saved parsed JSON to: $PUBLISH_JSON_FILE"
 
-PACKAGE_ID=$(echo "$publishedObjs" | jq -r '.packageId')
+# Detect explicit publish error payloads.
+if [ "$(echo "$publish_res" | jq -r 'has("error")')" = "true" ]; then
+  echo "Error during move contract publishing:"
+  echo "$publish_res" | jq -r '.error'
+  exit 1
+fi
 
-newObjs=$(echo "$publish_res" | jq -r '.objectChanges[] | select(.type == "created")')
+PACKAGE_ID=$(echo "$publish_res" | jq -r 'first(.objectChanges[] | select(.type == "published") | .packageId)')
+PUBLISHER_ID=$(echo "$publish_res" | jq -r 'first(.objectChanges[] | select(.type == "created" and (.objectType | contains("::Publisher"))) | .objectId)')
+KEY_REGISTRY_ID=$(echo "$publish_res" | jq -r 'first(.objectChanges[] | select(.type == "created" and (.objectType | endswith("::key_registry::KeyRegistry"))) | .objectId)')
 
-PUBLISHER_ID=$(echo "$newObjs" | jq -r 'select (.objectType | contains("::Publisher")).objectId')
+if [ -z "$PACKAGE_ID" ] || [ "$PACKAGE_ID" = "null" ]; then
+  echo "Error: could not extract package ID from publish output."
+  exit 1
+fi
 
-# Extract KeyRegistry ID
-KEY_REGISTRY_ID=$(echo "$newObjs" | jq -r 'select (.objectType | endswith("::key_registry::KeyRegistry")).objectId')
+if [ -z "$KEY_REGISTRY_ID" ] || [ "$KEY_REGISTRY_ID" = "null" ]; then
+  echo "Error: could not extract key registry ID from publish output."
+  exit 1
+fi
 
 # Update .env file (append or update existing values)
 

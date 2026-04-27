@@ -136,6 +136,14 @@ public fun set_pk(registry: &mut KeyRegistry, pub: &Publisher, pk: vector<u8>) {
     registry.inner_mut().pk = pk;
 }
 
+/// Test-only helper to override registry key material without requiring a
+/// Publisher capability in test setup flows.
+#[test_only]
+public fun set_pk_for_testing(registry: &mut KeyRegistry, pk: vector<u8>) {
+    assert!(pk.length() == ED25519_PUBLIC_KEY_LENGTH, EInvalidPublicKeyLength);
+    registry.inner_mut().pk = pk;
+}
+
 /// Verifies that the transaction sender corresponds to the stored public key.
 /// This function derives the Sui address from the stored public key and
 /// compares it with the transaction sender. Used to verify that administrative

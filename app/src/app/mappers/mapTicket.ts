@@ -11,9 +11,15 @@ export const mapTicket = (ticket: OnChainTicket): Ticket => {
       : ticket.stage;
 
   const { image, roundedImage, ticketFrontImage } = getTicketImages(ticket);
+  const ticketId = typeof ticket.id === "string" ? ticket.id : ticket.id.id;
+  const loyaltyId =
+    typeof ticket.loyalty_id === "string"
+      ? ticket.loyalty_id
+      : (ticket.loyalty_id as any)?.id || "";
+
   return {
-    id: ticket.id.id,
-    loyaltyId: ticket.loyalty_id,
+    id: ticketId,
+    loyaltyId,
     eventDate: ticket.event_date,
     eventLocation: ticket.event_location,
     eventDescription: ticket.event_description,

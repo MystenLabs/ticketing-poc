@@ -1,8 +1,7 @@
-import { SuiClient } from "@mysten/sui/client";
+import { useCurrentClient } from "@mysten/dapp-kit-react";
 
 export const useSui = () => {
-  const FULL_NODE = process.env.NEXT_PUBLIC_SUI_NETWORK!;
-  const suiClient = new SuiClient({ url: FULL_NODE });
+  const suiClient = useCurrentClient();
 
   return {
     suiClient,

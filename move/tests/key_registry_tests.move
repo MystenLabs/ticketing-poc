@@ -1,6 +1,7 @@
 module ticketing_poc::key_registry_tests;
 
-use sui::{package::Publisher, test_utils::assert_eq};
+use sui::package::Publisher;
+use std::unit_test::assert_eq;
 use ticketing_poc::{
     key_registry::{Self, ESenderNotKeyOwner, EInvalidPublicKeyLength},
     ticket_tests,
@@ -11,7 +12,7 @@ public struct KEY_REGISTRY_TESTS has drop ()
 
 #[test]
 fun derive_address_from_pk() {
-    assert_eq(key_registry::derive_address_from_pk(&utils::admin_pk()), utils::admin_address());
+    assert_eq!(key_registry::derive_address_from_pk(&utils::admin_pk()), utils::admin_address());
 }
 
 #[test]
@@ -33,13 +34,13 @@ fun assert_sender_is_key_owner_fails() {
 fun set_pk() {
     let (scenario, mut registry, _loyalty) = setup(utils::admin_address());
     let publisher = scenario.take_from_sender<Publisher>();
-    assert_eq(registry.pk(), utils::admin_pk());
+    assert_eq!(registry.pk(), utils::admin_pk());
     key_registry::set_pk(
         &mut registry,
         &publisher,
         x"0000000000000000000000000000000000000000000000000000000000000000",
     );
-    assert_eq(registry.pk(), x"0000000000000000000000000000000000000000000000000000000000000000");
+    assert_eq!(registry.pk(), x"0000000000000000000000000000000000000000000000000000000000000000");
 
     scenario.return_to_sender(publisher);
     cleanup(scenario, registry, _loyalty);
@@ -57,18 +58,18 @@ fun set_pk_invalid_length() {
 fun cleanup_nonces() {
     let (mut scenario, mut registry, mut loyalty) = setup(utils::admin_address());
     scenario.next_tx(utils::ticket_minter_address());
-    assert_eq(registry.used_nonces().length(), 0);
+    assert_eq!(registry.used_nonces().length(), 0);
     let ticket = ticket_tests::create_ticket(&mut registry, &mut loyalty, scenario.ctx());
     transfer::public_transfer(ticket, utils::ticket_minter_address());
 
     let target_nonce = utils::admin_ticket_mint_nonce();
-    assert_eq(*registry.used_nonces().borrow(target_nonce), 0);
-    assert_eq(registry.used_nonces().length(), 1);
+    assert_eq!(*registry.used_nonces().borrow(target_nonce), 0);
+    assert_eq!(registry.used_nonces().length(), 1);
 
     scenario.next_tx(utils::admin_address());
     key_registry::cleanup_nonces(&mut registry, vector[target_nonce], scenario.ctx());
-    assert_eq(registry.used_nonces().length(), 0);
-    assert_eq(registry.used_nonces().contains(target_nonce), false);
+    assert_eq!(registry.used_nonces().length(), 0);
+    assert_eq!(registry.used_nonces().contains(target_nonce), false);
     cleanup(scenario, registry, loyalty);
 }
 

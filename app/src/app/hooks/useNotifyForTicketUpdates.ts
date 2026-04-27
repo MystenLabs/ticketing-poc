@@ -7,7 +7,7 @@ import { mapTicket } from "../mappers/mapTicket";
 import { Ticket } from "../types/Ticket";
 import { TICKET_STAGES } from "../data/constants";
 import { handleUnRegisterTicketId } from "../helpers/registerTicketsForUpdate";
-import { useCurrentAccount } from "@mysten/dapp-kit";
+import { useCurrentAccount } from "@mysten/dapp-kit-react";
 import { formatAddress } from "@mysten/sui/utils";
 
 export const useNotifyForTicketUpdates = () => {
@@ -58,17 +58,19 @@ export const useNotifyForTicketUpdates = () => {
     for (let ticketId of registeredTickets) {
       const ticket = await suiClient
         .getObject({
-          id: ticketId,
-          options: {
-            showContent: true,
-            showType: true,
-            showOwner: true,
+          objectId: ticketId,
+          include: {
+            json: true,
+            owner: true,
           },
         })
         .then((resp) => {
-          const owner = (resp.data?.owner as any)?.AddressOwner!;
+          const owner = (resp.object?.owner as any)?.$kind === "AddressOwner"
+            ? (resp.object?.owner as any).AddressOwner
+            : undefined;
           if (owner === address) {
-            const ticketObject = mapTicket((resp.data?.content as any)?.fields);
+            const ticketJson = resp.object?.json as any;
+            const ticketObject = mapTicket((ticketJson?.fields || ticketJson) as any);
             return ticketObject;
           }
           return undefined;

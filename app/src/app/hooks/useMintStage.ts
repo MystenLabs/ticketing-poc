@@ -1,11 +1,11 @@
 import { useState } from "react";
-import { useCurrentAccount } from "@mysten/dapp-kit";
+import { useCurrentAccount } from "@mysten/dapp-kit-react";
 import axios, { AxiosResponse } from "axios";
-import {
-  CreateSponsoredTransactionApiResponse,
-  ExecuteSponsoredTransactionApiInput,
-} from "@mysten/enoki/dist/cjs/EnokiClient/type";
 import toast from "react-hot-toast";
+
+interface CreateSponsoredTransactionResponse {
+  digest: string;
+}
 
 interface UseMintStageResult {
   mintStage: (ticketId: string) => Promise<string | undefined>;
@@ -30,7 +30,7 @@ export const useMintStage = (): UseMintStageResult => {
 
     try {
       // Call the API to create sponsored transaction
-      const response: AxiosResponse<CreateSponsoredTransactionApiResponse> =
+      const response: AxiosResponse<CreateSponsoredTransactionResponse> =
         await axios.post("/api/stage/mint", {
           ticketId,
         });

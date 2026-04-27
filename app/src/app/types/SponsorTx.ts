@@ -1,4 +1,4 @@
-import { EnokiNetwork } from "@mysten/enoki/dist/cjs/EnokiClient/type";
+export type EnokiNetwork = "mainnet" | "testnet" | "devnet";
 
 export interface SponsorTxRequestBody {
   network: EnokiNetwork;

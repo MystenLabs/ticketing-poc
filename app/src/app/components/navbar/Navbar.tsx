@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useGetNavigations } from "@/app/hooks/useGetNavigations";
 import { cloneElement } from "react";
-import { useCurrentAccount } from "@mysten/dapp-kit";
+import { useCurrentAccount } from "@mysten/dapp-kit-react";
 
 export const Navbar = () => {
   const pathname = usePathname();

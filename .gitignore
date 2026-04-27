@@ -18,6 +18,7 @@ yarn-debug.log*
 yarn-error.log*
 lerna-debug.log*
 pnpm-debug.log*
+.pnpm-store/
 sui.log*
 
 # Dependency and build-related directories
@@ -48,3 +49,5 @@ app/.env.localnet
 app/.env.devnet
 app/.env.testnet
 app/.env.mainnet
+
+*.key

@@ -29,8 +29,8 @@ export interface OnChainTicket {
   event_location: string;
   id: {
     id: string;
-  };
-  loyalty_id: string;
+  } | string;
+  loyalty_id: string | { id: string };
   loyalty_points: string;
   seats: string[];
   section: string;
